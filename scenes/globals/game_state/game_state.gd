@@ -145,6 +145,7 @@ func can_restore() -> bool:
 func restore() -> Dictionary:
 	var amount_in_state: int = _state.get_value(INVENTORY_SECTION, INVENTORY_ITEMS_AMOUNT_KEY, 0)
 	var amount: int = clamp(amount_in_state, 0, InventoryItem.ItemType.size())
+	inventory.clear()
 	for index in range(amount):
 		var item := InventoryItem.with_type(index)
 		inventory.append(item)
