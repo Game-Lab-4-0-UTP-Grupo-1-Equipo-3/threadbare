@@ -39,10 +39,20 @@ const TRANSIENT_SCENES := [
 ## when the player returns to Fray's End the loom can trigger a brief cutscene.
 var incorporating_threads: bool = false
 
+var _started_from_main_scene: bool
 var _state := ConfigFile.new()
 
 
 func _ready() -> void:
+	var initial_scene_uid := ResourceLoader.get_resource_uid(
+		get_tree().current_scene.scene_file_path
+	)
+	var main_scene_uid := ResourceLoader.get_resource_uid(
+		ProjectSettings.get_setting("application/run/main_scene")
+	)
+	_started_from_main_scene = initial_scene_uid == main_scene_uid
+	if not _started_from_main_scene:
+		return
 	var err := _state.load(GAME_STATE_PATH)
 	if err != OK and err != ERR_FILE_NOT_FOUND:
 		push_error("Failed to load %s: %s" % [GAME_STATE_PATH, err])
@@ -147,6 +157,8 @@ func restore() -> Dictionary:
 
 
 func _save() -> void:
+	if not _started_from_main_scene:
+		return
 	var err := _state.save(GAME_STATE_PATH)
 	if err != OK:
 		push_error("Failed to save settings to %s: %s" % [GAME_STATE_PATH, err])
